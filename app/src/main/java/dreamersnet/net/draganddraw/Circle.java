@@ -39,7 +39,8 @@ public class Circle extends Shapes {
         float right = Math.max(mOrigin.x, mEnd.x);
         float top = Math.min(mOrigin.y, mEnd.y);
         float bottom = Math.max(mOrigin.y, mEnd.y);
-        c.drawCircle((left+right)/2.0f,(bottom+top)/2.0f,(right-left)/2.0f,mPaint);
+        float radius = (float) Math.sqrt(Math.pow((right-left),2.0)+Math.pow((bottom-top),2.0))/2.0f;
+        c.drawCircle((right+left)/2.0f,(bottom+top)/2.0f,radius,mPaint);
     }
 
     public void setOrigin(PointF origin) {
