@@ -8,11 +8,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.R.attr.action;
 
 /**
  * Created by water on 11/6/2016.
@@ -20,8 +18,8 @@ import static android.R.attr.action;
 
 public class BoxDrawingView extends View {
     private static final String TAG = "BoxDrawingView";
-    private Box mCurrentBox;
-    private List<Box> mBoxen = new ArrayList<>();
+    private Shapes mCurrentShape;
+    private List<Shapes> mShapes = new ArrayList<>();
     private Paint mBoxPaint;
     private Paint mTextPaint;
     private Paint mBackgroundPaint;
@@ -53,30 +51,43 @@ public class BoxDrawingView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         PointF current = new PointF(event.getX(),event.getY());
         String action = "";
+        if (mCurrentShape == null ) {
+            if (mShapes.size()%2 == 0) {
+                mCurrentShape = new Box(current);
+                mCurrentShape.setPaint(mBoxPaint);
+
+            } else {
+                mCurrentShape = new Circle(current);
+                mCurrentShape.setPaint(mBoxPaint);
+            }
+        }
 
         switch(event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 action = "ACTION_DOWN";
                 //Reset drawing state
-                mCurrentBox = new Box(current);
-                mBoxen.add(mCurrentBox);
+                if (mCurrentShape == null) {
+                    mCurrentShape = new Box(current);
+                    mCurrentShape.setPaint(mBoxPaint);
+                }
+                mShapes.add(mCurrentShape);
                 break;
             case MotionEvent.ACTION_MOVE:
                 action = "ACTION_MOVE";
                 //update box
-                if (mCurrentBox != null) {
-                    mCurrentBox.setCurrent(current);
+                if (mCurrentShape != null) {
+                    mCurrentShape.setEnd(current);
                     invalidate();
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 action = "ACTION_UP";
                 //release the current box
-                mCurrentBox = null;
+                mCurrentShape = null;
                 break;
             case MotionEvent.ACTION_CANCEL:
                 action = "ACTION_CANCEL";
-                mCurrentBox = null;
+                mCurrentShape = null;
                 break;
         }
         Log.i(TAG, action + " at x= " + current.x + ", " + current.y);
@@ -88,26 +99,22 @@ public class BoxDrawingView extends View {
         //Fill background
         canvas.drawPaint(mBackgroundPaint);
 
-        for (Box box: mBoxen) {
-            float left = Math.min(box.getOrigin().x, box.getCurrent().x);
-            float right = Math.max(box.getOrigin().x, box.getCurrent().x);
-            float top = Math.min(box.getOrigin().y, box.getCurrent().y);
-            float bottom = Math.max(box.getOrigin().y, box.getCurrent().y);
-
-            canvas.drawRect(left,top,right,bottom, mBoxPaint);
+        for (Shapes shape : mShapes) {
+            shape.draw(canvas);
         }
-        canvas.drawText("" + mBoxen.size(), 10.0f,getHeight()-30.0f, mTextPaint);
-        if (mBoxen.size() < 1) {
+
+        canvas.drawText("" + mShapes.size(), 10.0f,getHeight()-30.0f, mTextPaint);
+        if (mShapes.size() < 1) {
             canvas.drawText("You should tap and drag to draw box",30.0f,30.0f,mTextPaint);
-        } else if (mBoxen.size() < 5) {
+        } else if (mShapes.size() < 5) {
             canvas.drawText("Ah you're starting to get into it",100.0f,100.0f,mTextPaint);
-        } else if (mBoxen.size() < 25) {
+        } else if (mShapes.size() < 25) {
             canvas.drawText("Therapeutic isn't it?",200.0f,200.0f,mTextPaint);
-        } else if (mBoxen.size() < 30) {
+        } else if (mShapes.size() < 30) {
             canvas.drawText("Ok... this is getting crazy", 30.0f, 30.0f, mTextPaint);
-        } else if (mBoxen.size() < 35) {
+        } else if (mShapes.size() < 35) {
             canvas.drawText("You've gone box mad", 30.0f, 30.0f,mTextPaint);
-        } else if (mBoxen.size()< 50) {
+        } else if (mShapes.size()< 50) {
             canvas.drawText("You should be tired soon enough", 30.0f, 30.0f, mTextPaint);
         } else {
             canvas.drawText("Seriously?  Still at it?!", 30.0f, 30.0f, mTextPaint);

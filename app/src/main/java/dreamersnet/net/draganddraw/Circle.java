@@ -1,19 +1,19 @@
 package dreamersnet.net.draganddraw;
 
+import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.Canvas;
 
 /**
- * Created by water on 11/6/2016.
+ * Created by water on 11/14/2016.
  */
 
-public class Box extends Shapes {
+public class Circle extends Shapes {
     private PointF mOrigin;
     private PointF mEnd;
     private Paint mPaint;
 
-    public Box (PointF origin) {
+    public Circle (PointF origin) {
         mOrigin = origin;
         mEnd = origin;
         mPaint = new Paint();
@@ -39,7 +39,7 @@ public class Box extends Shapes {
         float right = Math.max(mOrigin.x, mEnd.x);
         float top = Math.min(mOrigin.y, mEnd.y);
         float bottom = Math.max(mOrigin.y, mEnd.y);
-        c.drawRect(left,top,right,bottom, mPaint);
+        c.drawCircle((left+right)/2.0f,(bottom+top)/2.0f,(right-left)/2.0f,mPaint);
     }
 
     public void setOrigin(PointF origin) {
